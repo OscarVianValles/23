@@ -34,11 +34,12 @@ typedef struct {
 void readFile(char* fileName, char text[][CHARACTER_LIMIT], document* doc, query* quer);
 int initWord(word*);
 int initSentence(sentence*);
-int initDocument(char text[][CHARACTER_LIMIT], document* doc);
+int initDocument(document* doc);
 int printWord(word);
+int printSentence(sentence s);
 int getWords(sentence*, char*);
+int getSentences(paragraph*, char*);
 int appendWord(sentence*, word*);
-void addWordCount(sentence*);
 
 int main(int argc, char *argv[]){
 
@@ -53,11 +54,9 @@ int main(int argc, char *argv[]){
 
   // //Reading from file
   // readFile(argv[1], text, doc, quer);
-  char s[1000] = "wassap party people";
-  sentence *newSentence = malloc(sizeof(sentence));
-
-  initSentence(newSentence);
-  getWords(newSentence, s);
+  char s[1000] = "the quick brown fox jumped. over the lazy dog. a lot of lazy dogs jumped. a lot.";
+  paragraph *newParagraph = malloc(sizeof(paragraph));
+  getSentences(newParagraph, s);
   return 0;
 }
 
@@ -141,32 +140,46 @@ void readFile(char* fileName, char text[][CHARACTER_LIMIT], document* doc, query
   fclose(fp);
 }
 
+// PRINTING FUNCTIONS
 int printWord(word w) {
     // prints word
     printf("%s\n", w.data);
     return 1;
 }
 
+int printSentence(sentence s){
+  for(int i = 0; i < s.word_count; i++){
+    printf("%s\n", s.data[i].data);
+  }
+}
+
+// APPENDING FUNCTIONS
+
 // Appends words to the current sentence being modified
 int appendWord(sentence* s, word* w) {
     //Allocating new memory for the words arrays if the number of words currently in the struct is 1 less than the maximum it can hold.
-    if(s->word_count+1 % 10 == 0){
-      word *words = malloc(sizeof(*word) * (s->word_count + 10));
+    if(s->word_count+1 % 10 == 0 || s->word_count == 0){
+      word *words = malloc(sizeof(w) * (s->word_count + 10));
 
       //Copying current data found in s->data
-      memcpy(words, s->data, sizeof(word * s->word_count));
 
-      //Freeing current data
-      free(s->data);
+      if(s->data != NULL){
+        memcpy(words, s->data, (sizeof(word) * s->word_count));
+
+        //Freeing current data
+        free(s->data);
+      }
 
       //Connecting the new pointer to the struct
       s->data = words;
     }
 
     //Adding the new word to the list
-    s->data[s->word_count + 1] = w;
+    s->data[s->word_count++] = *w;
     return 1;
 }
+
+// GETTING FUNCTIONS
 
 // Gets each individual word to form a sentence
 int getWords(sentence* s, char* arr) {
@@ -190,8 +203,7 @@ int getWords(sentence* s, char* arr) {
 
           // Copy the data from the tokenized string and add it to the new word
           strcpy(newData, tok);
-          newWord->newData
-
+          newWord->data = newData;
 
           // append word to sentence
           appendWord(s, newWord);
@@ -200,6 +212,38 @@ int getWords(sentence* s, char* arr) {
         // Continue tokenizing
         tok = strtok(NULL, " ");
     }
+
+    return 1;
+}
+
+// Gets each sentence that is separated by a . or the end of the line
+int getSentences(paragraph* s, char* arr){
+  // Variable to store tokenized data
+  char* tok;
+
+  // tokenizing process start
+  tok = strtok(arr, ".");
+
+  while(tok != NULL) {
+    //Catch to prevent segfault
+    if(tok != NULL){
+
+      // Creating new sentence pointer and new data pointer to survive after the end of the function;
+      sentence *newSentence = malloc(sizeof(sentence));
+
+      //Initializing data
+      initSentence(newSentence);
+
+      //Getting individual words to form the sentence
+      getWords(newSentence, tok);
+      printSentence(*newSentence);
+    }
+
+    printf("after if");
+
+    // Continue tokenizing
+    tok = strtok(NULL, ".");
+  }
 
     return 1;
 }
