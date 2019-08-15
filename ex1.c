@@ -65,8 +65,8 @@ int main(int argc, char *argv[]){
   //
   paragraph *p = malloc(sizeof(paragraph));
 
-  char text2[][1000] = {{"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."},{"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."},{"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."}};
-  getParagraphs(doc, text2);
+  char text2[] = {"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."};
+  getSentences(p, text2);
 
   free(quer);
   free(doc);
