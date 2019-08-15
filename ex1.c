@@ -31,19 +31,23 @@ typedef struct {
     int query_count;
 } query;
 
-void readFile(char* fileName, char text[][CHARACTER_LIMIT], document* doc, query* quer);
+void readFile(char*, char text[][CHARACTER_LIMIT], document*, query*);
 
 int initWord(word*);
 int initSentence(sentence*);
-int initDocument(document* doc);
+int initParagraph(paragraph*);
+int initDocument(document*);
 
 int printWord(word);
 int printSentence(sentence s);
 
 int getWords(sentence*, char*);
 int getSentences(paragraph*, char*);
+int getParagraphs(document*, char text[][CHARACTER_LIMIT]);
 
 int appendWord(sentence*, word*);
+int appendSentence(paragraph*, sentence*);
+int appendParagraph(document*, paragraph*);
 
 int main(int argc, char *argv[]){
 
@@ -171,10 +175,19 @@ int printSentence(sentence s){
 int appendWord(sentence* s, word* w) {
     //Allocating new memory for the words arrays if the number of words currently in the struct is 1 less than the maximum it can hold.
     if(s->word_count+1 % 10 == 0 || s->word_count == 0){
-      word *words = malloc(sizeof(word*) * (s->word_count + 10));
+
+      //Handle the first creation of the sentences;
+      if(s->word_count == 0){
+        word *words = malloc(sizeof(word*) * (s->word_count + 10));
+      }
+
+      //Since the check will be true if the word_count will end in 9, ie 19 or 29, the additional memory ssaces to be added will be 11 to make
+      //it a round number;
+      else {
+        word *words = malloc(sizeof(word*) * (s->word_count + 11));
+      }
 
       //Copying current data found in s->data
-
       if(s->data != NULL){
         memcpy(words, s->data, (sizeof(word*) * s->word_count));
 
@@ -194,7 +207,18 @@ int appendWord(sentence* s, word* w) {
 int appendSentence(paragraph* p, sentence* s){
     //Allocating new memory for the sentence arrays if the number of sentences currently in the struct is 1 less than the maximum it can hold.
     if(p->sentence_count+1 % 10 == 0 || p->sentence_count == 0){
-      sentence *sentences = malloc(sizeof(sentence*) * (p->sentence_count + 10));
+
+      //Handle the first creation of the sentences;
+      if(p->sentence_count == 0){
+        sentence *sentences = malloc(sizeof(sentence*) * (p->sentence_count + 10));
+      }
+
+      //Since the check will be true if the sentence_count will end in 9, ie 19 or 29, the additional memory spaces to be added will be 11 to make
+      //it a round number;
+      else {
+        sentence *sentences = malloc(sizeof(sentence*) * (p->sentence_count + 11));
+      }
+
 
       //Copying current data found in p->data
 
