@@ -30,11 +30,12 @@ void addWordCount(sentence*);
 
 int main(){
 
-    char s[10000] = "hello there people";
-    sentence *newSentence = malloc(sizeof(char)*strlen(s));
+    // Sentence to Words Sample
+    // char s[10000] = "hello there people";
+    // sentence *newSentence = malloc(sizeof(char)*strlen(s));
 
-    initSentence(newSentence);
-    getWords(newSentence, s);
+    // initSentence(newSentence);
+    // getWords(newSentence, s);
 
     return 0;
 }
