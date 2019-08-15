@@ -159,12 +159,12 @@ int printSentence(sentence s){
 int appendWord(sentence* s, word* w) {
     //Allocating new memory for the words arrays if the number of words currently in the struct is 1 less than the maximum it can hold.
     if(s->word_count+1 % 10 == 0 || s->word_count == 0){
-      word *words = malloc(sizeof(w) * (s->word_count + 10));
+      word *words = malloc(sizeof(word*) * (s->word_count + 10));
 
       //Copying current data found in s->data
 
       if(s->data != NULL){
-        memcpy(words, s->data, (sizeof(word) * s->word_count));
+        memcpy(words, s->data, (sizeof(word*) * s->word_count));
 
         //Freeing current data
         free(s->data);
@@ -185,9 +185,10 @@ int appendWord(sentence* s, word* w) {
 int getWords(sentence* s, char* arr) {
     //Variable to store tokenized data
     char* tok;
+    char* rest = arr;
 
     // tokenizing process start
-    tok = strtok(arr, " ");
+    tok = strtok_r(arr, " ", &rest);
 
     while(tok != NULL) {
 
@@ -210,7 +211,7 @@ int getWords(sentence* s, char* arr) {
         }
 
         // Continue tokenizing
-        tok = strtok(NULL, " ");
+        tok = strtok_r(NULL, " ", &rest);
     }
 
     return 1;
@@ -220,9 +221,10 @@ int getWords(sentence* s, char* arr) {
 int getSentences(paragraph* s, char* arr){
   // Variable to store tokenized data
   char* tok;
+  char* rest = arr;
 
   // tokenizing process start
-  tok = strtok(arr, ".");
+  tok = strtok_r(arr, ".", &rest);
 
   while(tok != NULL) {
     //Catch to prevent segfault
@@ -234,15 +236,16 @@ int getSentences(paragraph* s, char* arr){
       //Initializing data
       initSentence(newSentence);
 
-      printf("tok: %s\n", tok);
       //Getting individual words to form the sentence
       getWords(newSentence, tok);
+
+      //DEBUG
       printSentence(*newSentence);
+      printf("\n");
     }
 
     // Continue tokenizing
-    tok = strtok(NULL, ".");
-    printf("tok: %s", tok);
+    tok = strtok_r(NULL, ".", &rest);
   }
 
     return 1;
