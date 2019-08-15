@@ -234,15 +234,15 @@ int getSentences(paragraph* s, char* arr){
       //Initializing data
       initSentence(newSentence);
 
+      printf("tok: %s\n", tok);
       //Getting individual words to form the sentence
       getWords(newSentence, tok);
       printSentence(*newSentence);
     }
 
-    printf("after if");
-
     // Continue tokenizing
     tok = strtok(NULL, ".");
+    printf("tok: %s", tok);
   }
 
     return 1;
