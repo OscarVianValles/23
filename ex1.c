@@ -56,9 +56,9 @@ int freeParagraph(paragraph);
 int freeSentence(sentence);
 int freeWord(word);
 
-paragraph kth_paragraph(int);
-sentence kth_sentence_in_mth_paragraph(int, int);
-word kth_word_in_mth_sentence_in_nth_paragraph(int, int, int);
+paragraph *findParagraph(document,int);
+sentence *findSentence(document,int, int);
+word *findWord(document, int, int, int);
 
 int main(int argc, char *argv[]) {
 
@@ -183,27 +183,62 @@ void readFile(char *fileName, char text[][CHARACTER_LIMIT], document *doc,
   // Save the queries to the struct
   quer->data = queries;
 
+  char *tok;
+  char *rest = *queries;
+
+  for(int j = 0; j < quer->query_count; j++) {
+
+    tok = strtok_r(queries[j], " ", &rest);
+
+    int count = 0;
+    int queryArray[4] = {0};
+
+    while (tok != NULL) {
+
+      if (tok != NULL)
+        queryArray[count++] = atoi(tok);
+
+      tok = strtok_r(NULL, " ", &rest);
+      count++;
+    }
+
+    switch(queryArray[0]) {
+      case 1:
+        printParagraph(*findParagraph(*doc, queryArray[1]));
+        break;
+      case 2:
+        printSentence(*findSentence(*doc, queryArray[1], queryArray[2]));
+        break;
+      case 3:
+        printWord(*findWord(*doc, queryArray[1], queryArray[2], queryArray[3]));
+        break;
+    }
+  }
+
   // Closes file
   fclose(fp);
 }
 
 // PRINTING FUNCTIONS
 int printWord(word w) {
-  printf("%s\n", w.data);
+  // printf("%s", w.data);
+  printf("word");
   return 1;
 }
 
 int printSentence(sentence s) {
-  for (int i = 0; i < s.word_count; i++) {
-    printf("%s\n", s.data[i].data);
-  }
+  // for (int i = 0; i < s.word_count; i++) {
+  //   printf("%s", s.data[i].data);
+  // }
+  printf("sentence");
   return 1;
 }
 
 int printParagraph(paragraph p) {
-  for (int i = 0; i < p.sentence_count; i++) {
-    printSentence((p.data[i]));
-  }
+  // for (int i = 0; i < p.sentence_count; i++) {
+  //   printSentence((p.data[i]));
+  // }
+  printf("paragraph");
   return 1;
 }
 
@@ -411,6 +446,7 @@ int freeDocument(document *doc) {
   free(doc->data);
   return 1;
 }
+
 int freeParagraph(paragraph p) {
   for (int i = 0; i < p.sentence_count; i++) {
     freeSentence(p.data[i]);
@@ -419,6 +455,7 @@ int freeParagraph(paragraph p) {
   free(p.data);
   return 1;
 }
+
 int freeSentence(sentence s) {
   for (int i = 0; i < s.word_count; i++) {
     freeWord(s.data[i]);
@@ -427,7 +464,20 @@ int freeSentence(sentence s) {
   free(s.data);
   return 1;
 };
+
 int freeWord(word w) {
   free(w.data);
   return 1;
+}
+
+paragraph *findParagraph(document doc, int k) {
+  return &doc.data[k];
+}
+
+sentence *findSentence(document doc, int k, int m) {
+  return &doc.data[k].data[m];
+}
+
+word *findWord(document doc, int k, int m, int n) {
+  return &doc.data[k].data[m].data[n];
 }
