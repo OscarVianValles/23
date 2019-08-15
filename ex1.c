@@ -51,6 +51,11 @@ int appendWord(sentence *, word);
 int appendSentence(paragraph *, sentence);
 int appendParagraph(document *, paragraph);
 
+int freeDocument(document *);
+int freeParagraph(paragraph);
+int freeSentence(sentence);
+int freeWord(word);
+
 paragraph kth_paragraph(int);
 sentence kth_sentence_in_mth_paragraph(int, int);
 word kth_word_in_mth_sentence_in_nth_paragraph(int, int, int);
@@ -80,6 +85,7 @@ int main(int argc, char *argv[]) {
 
   getParagraphs(doc, text);
   free(quer);
+  freeDocument(doc);
   free(doc);
 
   return 0;
@@ -393,5 +399,35 @@ int getParagraphs(document *doc, char text[][CHARACTER_LIMIT]) {
     appendParagraph(doc, newParagraph);
   }
 
+  return 1;
+}
+
+// FREE FUNCTIIONS
+int freeDocument(document *doc) {
+  for (int i = 0; i < doc->paragraph_count; i++) {
+    freeParagraph(doc->data[i]);
+  }
+
+  free(doc->data);
+  return 1;
+}
+int freeParagraph(paragraph p) {
+  for (int i = 0; i < p.sentence_count; i++) {
+    freeSentence(p.data[i]);
+  }
+
+  free(p.data);
+  return 1;
+}
+int freeSentence(sentence s) {
+  for (int i = 0; i < s.word_count; i++) {
+    freeWord(s.data[i]);
+  }
+
+  free(s.data);
+  return 1;
+};
+int freeWord(word w) {
+  free(w.data);
   return 1;
 }
