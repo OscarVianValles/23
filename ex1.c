@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define QUERY_LIMIT 1000
 #define BUFFER_LIMIT 2000
@@ -8,61 +8,61 @@
 #define PARAGRAPH_LIMIT 5
 
 typedef struct {
-    char* data;
+  char *data;
 } word;
 
 typedef struct {
-    word* data;
-    int word_count;
+  word *data;
+  int word_count;
 } sentence;
 
 typedef struct {
-    sentence* data;
-    int sentence_count;
+  sentence *data;
+  int sentence_count;
 } paragraph;
 
 typedef struct {
-    paragraph* data;
-    int paragraph_count;
+  paragraph *data;
+  int paragraph_count;
 } document;
 
 typedef struct {
-    char** data;
-    int query_count;
+  char **data;
+  int query_count;
 } query;
 
-void readFile(char*, char text[][CHARACTER_LIMIT], document*, query*);
+void readFile(char *, char text[][CHARACTER_LIMIT], document *, query *);
 
-int initWord(word*);
-int initSentence(sentence*);
-int initParagraph(paragraph*);
-int initDocument(document*);
-int initQuery(query*);
+int initWord(word *);
+int initSentence(sentence *);
+int initParagraph(paragraph *);
+int initDocument(document *);
+int initQuery(query *);
 
 int printWord(word);
 int printSentence(sentence);
 int printParagraph(paragraph);
 
-int getWords(sentence*, char*);
-int getSentences(paragraph*, char*);
-int getParagraphs(document*, char text[][CHARACTER_LIMIT]);
+int getWords(sentence *, char *);
+int getSentences(paragraph *, char *);
+int getParagraphs(document *, char text[][CHARACTER_LIMIT]);
 
-int appendWord(sentence*, word*);
-int appendSentence(paragraph*, sentence*);
-int appendParagraph(document*, paragraph*);
+int appendWord(sentence *, word);
+int appendSentence(paragraph *, sentence);
+int appendParagraph(document *, paragraph);
 
 paragraph kth_paragraph(int);
 sentence kth_sentence_in_mth_paragraph(int, int);
 word kth_word_in_mth_sentence_in_nth_paragraph(int, int, int);
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
 
-  //Initialize Document
+  // Initialize Document
 
-  //Intializing Text
+  // Intializing Text
   char text[PARAGRAPH_LIMIT][CHARACTER_LIMIT];
 
-  //Initializing main document variables
+  // Initializing main document variables
   query *quer = malloc(sizeof(query));
   document *doc = malloc(sizeof(document));
 
@@ -74,12 +74,13 @@ int main(int argc, char *argv[]){
 
   // paragraph *p = malloc(sizeof(paragraph));
 
-  // char text2[][1000] = {{"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."}, {"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."}, {"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."}};
-  // getParagraphs(doc, text2);
+  // char text2[][1000] = {{"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."},
+  // {"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."}, {"asdfasdf.
+  // asdfasdfklaj;sdfl. laksdj;laksd."}}; getParagraphs(doc, text2);
 
+  getParagraphs(doc, text);
   free(quer);
   free(doc);
-  // free(p);
 
   return 0;
 }
@@ -106,7 +107,7 @@ int initParagraph(paragraph *p) {
 }
 
 // initialize the document
-int initDocument(document *doc){
+int initDocument(document *doc) {
   doc->data = NULL;
   doc->paragraph_count = 0;
   return 1;
@@ -118,90 +119,84 @@ int initQuery(query *quer) {
   return 1;
 }
 
-//MAIN FUNCTIONS
+// MAIN FUNCTIONS
 
-// Reads the files, saving the number of paragraphs and queries to their respictive structs.
-// Also saves the text that needs to be tokenized
-void readFile(char* fileName, char text[][CHARACTER_LIMIT], document* doc, query* quer){
-  //Initializing variables
+// Reads the files, saving the number of paragraphs and queries to their
+// respictive structs. Also saves the text that needs to be tokenized
+void readFile(char *fileName, char text[][CHARACTER_LIMIT], document *doc,
+              query *quer) {
+  // Initializing variables
   char buffer[2000] = {0};
-  char** queries;
+  char **queries;
 
-  //Opening File
+  // Opening File
   FILE *fp;
   fp = fopen(fileName, "r");
 
-  //Error Checking
-  if(fp == NULL){
+  // Error Checking
+  if (fp == NULL) {
     perror("Error opening file");
     return;
   }
 
-  //Parsing through the file
+  // Parsing through the file
   int paragraphCount = -1, queryCount = -1, counter = 0;
   while (fgets(buffer, BUFFER_LIMIT, fp) != NULL) {
 
-    //Gets the number of paragraphs on the first loop
-    if(paragraphCount == -1){
+    // Gets the number of paragraphs on the first loop
+    if (paragraphCount == -1) {
       paragraphCount = atoi(buffer);
       doc->paragraph_count = paragraphCount;
     }
 
-    //Gets the paragraph strings
+    // Gets the paragraph strings
     else if (paragraphCount > 0) {
       strcpy(text[counter++], buffer);
       paragraphCount--;
     }
 
-    //If paragraph count is 0, this means that the following line is now the queries
-    else if (paragraphCount == 0 && queryCount == -1){
+    // If paragraph count is 0, this means that the following line is now the
+    // queries
+    else if (paragraphCount == 0 && queryCount == -1) {
       queryCount = atoi(buffer);
       quer->query_count = queryCount;
       counter = 0;
-      queries = malloc(queryCount * sizeof(char*));
-      for (int i = 0; i < queryCount; i++){
+      queries = malloc(queryCount * sizeof(char *));
+      for (int i = 0; i < queryCount; i++) {
         queries[i] = malloc((CHARACTER_LIMIT) * sizeof(char));
       }
     }
 
-    //Save the queries to a temporary holder
-    else if (queryCount > 0){
+    // Save the queries to a temporary holder
+    else if (queryCount > 0) {
       strcpy(queries[counter++], buffer);
       queryCount--;
     }
   }
 
-  getParagraphs(doc, text);
-
-  //Save the queries to the struct
+  // Save the queries to the struct
   quer->data = queries;
-  
-  for (int i = 0; i < queryCount; i++){
-    free(queries[i]);
-  }
 
-  free(queries);
-
-  //Closes file
+  // Closes file
   fclose(fp);
 }
 
 // PRINTING FUNCTIONS
 int printWord(word w) {
-    printf("%s\n", w.data);
-    return 1;
+  printf("%s\n", w.data);
+  return 1;
 }
 
-int printSentence(sentence s){
-  for(int i = 0; i < s.word_count; i++){
+int printSentence(sentence s) {
+  for (int i = 0; i < s.word_count; i++) {
     printf("%s\n", s.data[i].data);
   }
   return 1;
 }
 
 int printParagraph(paragraph p) {
-  for(int i = 0; i< p.sentence_count; i++) {
-    printf("%s\n", p.data[i]);
+  for (int i = 0; i < p.sentence_count; i++) {
+    printSentence((p.data[i]));
   }
   return 1;
 }
@@ -209,201 +204,193 @@ int printParagraph(paragraph p) {
 // APPENDING FUNCTIONS
 
 // Appends words to the current sentence being modified
-int appendWord(sentence* s, word* w) {
-  //Allocating new memory for the words arrays if the number of words currently in the struct is 1 less than the maximum it can hold.
-  if(s->word_count+1 % 10 == 0 || s->word_count == 0){
+int appendWord(sentence *s, word w) {
+  // Allocating new memory for the words arrays if the number of words currently
+  // in the struct is 1 less than the maximum it can hold.
+  if (s->word_count + 1 % 10 == 0 || s->word_count == 0) {
 
     // creating the new pointer;
     word *words;
-    //Handle the first creation of the sentences;
+    // Handle the first creation of the sentences;
 
-    if(s->word_count == 0){
-      words = malloc(sizeof(word*) * (s->word_count + 10));
+    if (s->word_count == 0) {
+      words = malloc(sizeof(word *) * (s->word_count + 10));
     }
 
-    //Since the check will be true if the word_count will end in 9, ie 19 or 29, the additional memory ssaces to be added will be 11 to make
-    //it a round number;
+    // Since the check will be true if the word_count will end in 9, ie 19 or
+    // 29, the additional memory ssaces to be added will be 11 to make it a
+    // round number;
     else {
-      words = malloc(sizeof(word*) * (s->word_count + 11));
+      words = malloc(sizeof(word *) * (s->word_count + 11));
     }
 
-    //Copying current data found in s->data
-    if(s->data != NULL){
-      memcpy(words, s->data, (sizeof(word*) * s->word_count));
+    // Copying current data found in s->data
+    if (s->data != NULL) {
+      memcpy(words, s->data, (sizeof(word *) * s->word_count));
 
-      //Freeing current data
+      // Freeing current data
       free(s->data);
     }
 
-    //Connecting the new pointer to the struct
+    // Connecting the new pointer to the struct
     s->data = words;
-
-    // free(words->data);
-    free(words);
   }
 
-  //Adding the new word to the list
-  s->data[s->word_count++] = *w;
+  // Adding the new word to the list
+  s->data[s->word_count++] = w;
   return 1;
 }
 
-int appendSentence(paragraph* p, sentence* s){
-  //Allocating new memory for the sentence arrays if the number of sentences currently in the struct is 1 less than the maximum it can hold.
-  if(p->sentence_count+1 % 10 == 0 || p->sentence_count == 0){
+int appendSentence(paragraph *p, sentence s) {
+  // Allocating new memory for the sentence arrays if the number of sentences
+  // currently in the struct is 1 less than the maximum it can hold.
+  if (p->sentence_count + 1 % 10 == 0 || p->sentence_count == 0) {
 
     // Creating the new pointer
     sentence *sentences;
 
-    //Handle the first creation of the sentences;
-    if(p->sentence_count == 0){
-      sentences = malloc(sizeof(sentence*) * (p->sentence_count + 10));
+    // Handle the first creation of the sentences;
+    if (p->sentence_count == 0) {
+      sentences = malloc(sizeof(sentence *) * (p->sentence_count + 10));
     }
 
-    //Since the check will be true if the sentence_count will end in 9, ie 19 or 29, the additional memory spaces to be added will be 11 to make
-    //it a round number;
+    // Since the check will be true if the sentence_count will end in 9, ie 19
+    // or 29, the additional memory spaces to be added will be 11 to make it a
+    // round number;
     else {
-      sentences = malloc(sizeof(sentence*) * (p->sentence_count + 11));
+      sentences = malloc(sizeof(sentence *) * (p->sentence_count + 11));
     }
 
+    // Copying current data found in p->data
 
-    //Copying current data found in p->data
+    if (p->data != NULL) {
+      memcpy(sentences, p->data, (sizeof(sentence *) * p->sentence_count));
 
-    if(p->data != NULL){
-      memcpy(sentences, p->data, (sizeof(sentence*) * p->sentence_count));
-
-      //Freeing current data
+      // Freeing current data
       free(p->data);
     }
 
-    //Connecting the new pointer to the struct
+    // Connecting the new pointer to the struct
     p->data = sentences;
-
-    // free(sentences->data);
-    free(sentences);
   }
 
-  //Adding the new word to the list
-  p->data[p->sentence_count++] = *s;
+  // Adding the new word to the list
+  p->data[p->sentence_count++] = s;
   return 1;
 }
 
-int appendParagraph(document* doc, paragraph* p){
-  //Allocate max memory for paragraph if first run
-  if(doc->data == NULL){
-    paragraph *paragraphs = malloc(sizeof(paragraph*) * PARAGRAPH_LIMIT);
+int appendParagraph(document *doc, paragraph p) {
+  // Allocate max memory for paragraph if first run
+  if (doc->data == NULL) {
+    paragraph *paragraphs = malloc(sizeof(paragraph) * PARAGRAPH_LIMIT);
     doc->data = paragraphs;
-    free(paragraphs);
   }
 
-  doc->data[doc->paragraph_count++] = *p;
+  doc->data[doc->paragraph_count++] = p;
 
   return 1;
 }
-
 
 // GETTING FUNCTIONS
 
 // Gets each individual word to form a sentence
-int getWords(sentence* s, char* arr) {
+int getWords(sentence *s, char *arr) {
 
-  //Variable to store tokenized data
-  char* tok;
-  char* rest = arr;
+  // Variable to store tokenized data
+  char *tok;
+  char *rest = arr;
 
   // tokenizing process start
   tok = strtok_r(arr, " ", &rest);
 
-  while(tok != NULL) {
+  while (tok != NULL) {
 
-      //Catch to prevent segfault
-      if(tok != NULL){
+    // Catch to prevent segfault
+    if (tok != NULL) {
 
-        // Creating new word pointer and new data pointer to survive after the end of the function;
-        char *newData = malloc(sizeof(char) * strlen(tok));
-        word *newWord = malloc(sizeof(word));
+      // Creating new word pointer and new data pointer to survive after the
+      // end of the function;
+      char *newData = malloc(sizeof(char) * (strlen(tok) + 1));
 
-        //Initializing data
-        initWord(newWord);
+      word newWord;
+      initWord(&newWord);
 
-        // Copy the data from the tokenized string and add it to the new word
-        strcpy(newData, tok);
-        newWord->data = newData;
+      // Initializing data
 
-        // append word to sentence
-        appendWord(s, newWord);
+      // Copy the data from the tokenized string and add it to the new word
+      strcpy(newData, tok);
+      newWord.data = newData;
 
-        // free(newWord);
-        // free(newData);
-      }
+      // append word to sentence
+      appendWord(s, newWord);
+    }
 
-      // Continue tokenizing
-      tok = strtok_r(NULL, " ", &rest);
+    // Continue tokenizing
+    tok = strtok_r(NULL, " ", &rest);
   }
 
   return 1;
 }
 
 // Gets each sentence that is separated by a . or the end of the line
-int getSentences(paragraph* p, char* arr){
+int getSentences(paragraph *p, char *arr) {
   // Variable to store tokenized data
-  char* tok;
-  char* rest = arr;
+  char *tok;
+  char *rest = arr;
 
   // tokenizing process start
   tok = strtok_r(arr, ".", &rest);
 
-  while(tok != NULL) {
-    //Catch to prevent segfault
-    if(tok != NULL){
+  while (tok != NULL) {
+    // Catch to prevent segfault
+    if (tok != NULL) {
 
-      // Creating new sentence pointer to survive after the end of the function;
-      sentence *newSentence = malloc(sizeof(sentence));
+      // Creating new sentence pointer to survive after the end of the
+      // function;
+      sentence newSentence;
 
-      //Initializing data
-      initSentence(newSentence);
+      // Initializing data
+      initSentence(&newSentence);
 
-      //Getting individual words to form the sentence
-      getWords(newSentence, tok);
+      // Getting individual words to form the sentence
+      getWords(&newSentence, tok);
 
       // printSentence(*newSentence);
 
-      //Appending sentences to the paragraphs
+      // Appending sentences to the paragraphs
       appendSentence(p, newSentence);
-
-      // free(newSentence);
     }
 
     // Continue tokenizing
     tok = strtok_r(NULL, ".", &rest);
   }
 
-    return 1;
+  return 1;
 }
 
-int getParagraphs(document *doc, char text[][CHARACTER_LIMIT]){
+int getParagraphs(document *doc, char text[][CHARACTER_LIMIT]) {
 
-  printf("%d\n", doc->paragraph_count);
+  int paragraphCount = doc->paragraph_count;
+  doc->paragraph_count = 0;
+  // Looping through all available paragraphs gathered from reading the file
+  for (int i = 0; i < paragraphCount; i++) {
 
-  //Looping through all available paragraphs gathered from reading the file
-  for(int i = 0; i < doc->paragraph_count; i++){
-    printf("%d\n", i);
-
-    // Creating new paragraph pointer that will survive after the end of the function
-    paragraph *newParagraph = malloc(sizeof(paragraph*));
+    // Creating new paragraph pointer that will survive after the end of the
+    // function
+    paragraph newParagraph;
 
     // Initializing data
-    initParagraph(newParagraph);
+    initParagraph(&newParagraph);
 
-    // Getting individual sentences. Since the structure of the text from reading the file is already
-    // separated by \n, there is no need to tokenize it anymore
-    getSentences(newParagraph, text[i]);
+    // Getting individual sentences. Since the structure of the text from
+    // reading the file is already separated by \n, there is no need to
+    // tokenize it anymore
+    getSentences(&newParagraph, text[i]);
 
-    // printParagraph(*newParagraph);
+    // printParagraph(newParagraph);
 
-    //Appending paragraphs to document
+    // Appending paragraphs to document
     appendParagraph(doc, newParagraph);
-    
-    // free(newParagraph);
   }
 
   return 1;
