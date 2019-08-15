@@ -33,6 +33,9 @@ typedef struct {
 
 void readFile(char* fileName, char text[][CHARACTER_LIMIT], document* myDocument, query* myQuery);
 void initializeDocument(char text[][CHARACTER_LIMIT], document* myDocument);
+int initWord(word*);
+int initSentence(sentence*);
+int printWord(word);
 int getWords(sentence*, char*);
 int appendWord(sentence*, word*);
 void addWordCount(sentence*);
@@ -112,6 +115,12 @@ void readFile(char* fileName, char text[][CHARACTER_LIMIT], document* myDocument
   fclose(fp);
 }
 
+int printWord(word w) {
+    // prints word
+    printf("%s\n", w.data);
+    return 1;
+}
+
 int initWord(word *w) {
     // initialize word data
     w->data = NULL;
@@ -122,12 +131,6 @@ int initSentence(sentence *s) {
     // initialize sentence data
     s->word_count = 0;
     s->data = NULL;
-    return 1;
-}
-
-int printWord(word w) {
-    // prints word
-    printf("%s\n", w.data);
     return 1;
 }
 
@@ -143,7 +146,6 @@ int appendWord(sentence *s, word *w) {
     free(s->data);
 
     s->data = malloc(100 * s->word_count);
-
     if(s->data==NULL)
         return 0;
     else {
