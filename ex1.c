@@ -51,20 +51,26 @@ int appendParagraph(document*, paragraph*);
 
 int main(int argc, char *argv[]){
 
-  // //Initialize Document
+  //Initialize Document
 
-  // //Intializing Text
-  // char text[PARAGRAPH_LIMIT][CHARACTER_LIMIT];
+  //Intializing Text
+  char text[PARAGRAPH_LIMIT][CHARACTER_LIMIT];
 
-  // //Initializing main document variables
-  // query *quer = malloc(sizeof(query));
-  // document *doc = malloc(sizeof(document));
+  //Initializing main document variables
+  query *quer = malloc(sizeof(query));
+  document *doc = malloc(sizeof(document));
 
-  // //Reading from file
+  // Reading from file
   // readFile(argv[1], text, doc, quer);
-  char s[1000] = "the quick brown fox jumped. over the lazy dog. a lot of lazy dogs jumped. a lot.";
-  paragraph *newParagraph = malloc(sizeof(paragraph));
-  getSentences(newParagraph, s);
+  //
+  paragraph *p = malloc(sizeof(paragraph));
+
+  char text2[][1000] = {{"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."},{"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."},{"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."}};
+  getParagraphs(doc, text2);
+
+  free(quer);
+  free(doc);
+  free(p);
   return 0;
 }
 
@@ -176,15 +182,18 @@ int appendWord(sentence* s, word* w) {
     //Allocating new memory for the words arrays if the number of words currently in the struct is 1 less than the maximum it can hold.
     if(s->word_count+1 % 10 == 0 || s->word_count == 0){
 
+      // creating the new pointer;
+      word *words;
       //Handle the first creation of the sentences;
+
       if(s->word_count == 0){
-        word *words = malloc(sizeof(word*) * (s->word_count + 10));
+        words = malloc(sizeof(word*) * (s->word_count + 10));
       }
 
       //Since the check will be true if the word_count will end in 9, ie 19 or 29, the additional memory ssaces to be added will be 11 to make
       //it a round number;
       else {
-        word *words = malloc(sizeof(word*) * (s->word_count + 11));
+        words = malloc(sizeof(word*) * (s->word_count + 11));
       }
 
       //Copying current data found in s->data
@@ -208,15 +217,18 @@ int appendSentence(paragraph* p, sentence* s){
     //Allocating new memory for the sentence arrays if the number of sentences currently in the struct is 1 less than the maximum it can hold.
     if(p->sentence_count+1 % 10 == 0 || p->sentence_count == 0){
 
+      // Creating the new pointer
+      sentence *sentences;
+
       //Handle the first creation of the sentences;
       if(p->sentence_count == 0){
-        sentence *sentences = malloc(sizeof(sentence*) * (p->sentence_count + 10));
+        sentences = malloc(sizeof(sentence*) * (p->sentence_count + 10));
       }
 
       //Since the check will be true if the sentence_count will end in 9, ie 19 or 29, the additional memory spaces to be added will be 11 to make
       //it a round number;
       else {
-        sentence *sentences = malloc(sizeof(sentence*) * (p->sentence_count + 11));
+        sentences = malloc(sizeof(sentence*) * (p->sentence_count + 11));
       }
 
 
@@ -236,7 +248,18 @@ int appendSentence(paragraph* p, sentence* s){
     //Adding the new word to the list
     p->data[p->sentence_count++] = *s;
     return 1;
+}
 
+int appendParagraph(document* doc, paragraph* p){
+  //Allocate max memory for paragraph if first run
+  if(doc->data == NULL){
+    paragraph *paragraphs = malloc(sizeof(paragraph*) * PARAGRAPH_LIMIT);
+    doc->data = paragraphs;
+  }
+
+  doc->data[doc->paragraph_count++] = *p;
+
+  return 1;
 }
 
 
@@ -244,6 +267,7 @@ int appendSentence(paragraph* p, sentence* s){
 
 // Gets each individual word to form a sentence
 int getWords(sentence* s, char* arr) {
+
     //Variable to store tokenized data
     char* tok;
     char* rest = arr;
@@ -291,7 +315,7 @@ int getSentences(paragraph* p, char* arr){
     //Catch to prevent segfault
     if(tok != NULL){
 
-      // Creating new sentence pointer and new data pointer to survive after the end of the function;
+      // Creating new sentence pointer to survive after the end of the function;
       sentence *newSentence = malloc(sizeof(sentence));
 
       //Initializing data
@@ -300,9 +324,7 @@ int getSentences(paragraph* p, char* arr){
       //Getting individual words to form the sentence
       getWords(newSentence, tok);
 
-      //DEBUG
       printSentence(*newSentence);
-      printf("\n");
 
       //Appending sentences to the paragraphs
       appendSentence(p, newSentence);
@@ -315,15 +337,23 @@ int getSentences(paragraph* p, char* arr){
     return 1;
 }
 
-int getParagraphs(document *doc, char* arr){
-  for(int i = 0; i < doc->paragraph_count; i++){
-    paragraph *newParagraph = malloc(sizeof(paragraph));
+int getParagraphs(document *doc, char text[][CHARACTER_LIMIT]){
 
+  //Looping through all available paragraphs gathered from reading the file
+  for(int i = 0; i < doc->paragraph_count; i++){
+    // Creating new paragraph pointer that will survive after the end of the function
+    paragraph *newParagraph = malloc(sizeof(paragraph*));
+
+    // Initializing data
     initParagraph(newParagraph);
 
-    getSentences(newParagraph, arr[i]);
+    // Getting individual sentences. Since the structure of the text from reading the file is already
+    // separated by \n, there is no need to tokenize it anymore
+    getSentences(newParagraph, text[i]);
 
-
+    //Appending paragraphs to document
+    appendParagraph(doc, newParagraph);
   }
 
+  return 1;
 }
