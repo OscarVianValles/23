@@ -31,11 +31,11 @@ void addWordCount(sentence*);
 int main(){
 
     // Sentence to Words Sample
-    char s[10000] = "hello there people";
-    sentence *newSentence = malloc(sizeof(char)*strlen(s));
+    // char s[10000] = "hello there people";
+    // sentence *newSentence = malloc(sizeof(char)*strlen(s));
 
-    initSentence(newSentence);
-    getWords(newSentence, s);
+    // initSentence(newSentence);
+    // getWords(newSentence, s);
 
     return 0;
 }
@@ -106,9 +106,6 @@ int getWords(sentence *s, char *arr) {
         tok = strtok(NULL, " ");
     }
     // tokenizing process end
-
-    for(int i = 0; i < s->word_count; i++)
-        printWord(s->data[i]);
 
     return 1;
 }
