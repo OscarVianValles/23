@@ -32,13 +32,17 @@ typedef struct {
 } query;
 
 void readFile(char* fileName, char text[][CHARACTER_LIMIT], document* doc, query* quer);
+
 int initWord(word*);
 int initSentence(sentence*);
 int initDocument(document* doc);
+
 int printWord(word);
 int printSentence(sentence s);
+
 int getWords(sentence*, char*);
 int getSentences(paragraph*, char*);
+
 int appendWord(sentence*, word*);
 
 int main(int argc, char *argv[]){
@@ -75,9 +79,17 @@ int initSentence(sentence *s) {
     return 1;
 }
 
+int initParagraph(paragraph *p) {
+    p->sentence_count = 0;
+    p->data = NULL;
+    return 1;
+}
+
 // initialize the document
 int initDocument(document *doc){
     doc->data = NULL;
+    doc->paragraph_count = 0;
+    return 1;
 }
 
 //MAIN FUNCTIONS
@@ -179,6 +191,31 @@ int appendWord(sentence* s, word* w) {
     return 1;
 }
 
+int appendSentence(paragraph* p, sentence* s){
+    //Allocating new memory for the sentence arrays if the number of sentences currently in the struct is 1 less than the maximum it can hold.
+    if(p->sentence_count+1 % 10 == 0 || p->sentence_count == 0){
+      sentence *sentences = malloc(sizeof(sentence*) * (p->sentence_count + 10));
+
+      //Copying current data found in p->data
+
+      if(p->data != NULL){
+        memcpy(sentences, p->data, (sizeof(sentence*) * p->sentence_count));
+
+        //Freeing current data
+        free(p->data);
+      }
+
+      //Connecting the new pointer to the struct
+      p->data = sentences;
+    }
+
+    //Adding the new word to the list
+    p->data[p->sentence_count++] = *s;
+    return 1;
+
+}
+
+
 // GETTING FUNCTIONS
 
 // Gets each individual word to form a sentence
@@ -218,7 +255,7 @@ int getWords(sentence* s, char* arr) {
 }
 
 // Gets each sentence that is separated by a . or the end of the line
-int getSentences(paragraph* s, char* arr){
+int getSentences(paragraph* p, char* arr){
   // Variable to store tokenized data
   char* tok;
   char* rest = arr;
@@ -242,6 +279,9 @@ int getSentences(paragraph* s, char* arr){
       //DEBUG
       printSentence(*newSentence);
       printf("\n");
+
+      //Appending sentences to the paragraphs
+      appendSentence(p, newSentence);
     }
 
     // Continue tokenizing
@@ -249,4 +289,17 @@ int getSentences(paragraph* s, char* arr){
   }
 
     return 1;
+}
+
+int getParagraphs(document *doc, char* arr){
+  for(int i = 0; i < doc->paragraph_count; i++){
+    paragraph *newParagraph = malloc(sizeof(paragraph));
+
+    initParagraph(newParagraph);
+
+    getSentences(newParagraph, arr[i]);
+
+
+  }
+
 }
