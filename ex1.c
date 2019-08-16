@@ -47,6 +47,8 @@ int getWords(sentence *, char *);
 int getSentences(paragraph *, char *);
 int getParagraphs(document *, char text[][CHARACTER_LIMIT]);
 
+int runQueries(query quer, document doc);
+
 int appendWord(sentence *, word);
 int appendSentence(paragraph *, sentence);
 int appendParagraph(document *, paragraph);
@@ -56,8 +58,8 @@ int freeParagraph(paragraph);
 int freeSentence(sentence);
 int freeWord(word);
 
-paragraph *findParagraph(document,int);
-sentence *findSentence(document,int, int);
+paragraph *findParagraph(document, int);
+sentence *findSentence(document, int, int);
 word *findWord(document, int, int, int);
 
 int main(int argc, char *argv[]) {
@@ -77,13 +79,8 @@ int main(int argc, char *argv[]) {
   // Reading from file
   readFile(argv[1], text, doc, quer);
 
-  // paragraph *p = malloc(sizeof(paragraph));
-
-  // char text2[][1000] = {{"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."},
-  // {"asdfasdf. asdfasdfklaj;sdfl. laksdj;laksd."}, {"asdfasdf.
-  // asdfasdfklaj;sdfl. laksdj;laksd."}}; getParagraphs(doc, text2);
-
   getParagraphs(doc, text);
+  runQueries(*quer, *doc);
   free(quer);
   freeDocument(doc);
   free(doc);
@@ -183,61 +180,27 @@ void readFile(char *fileName, char text[][CHARACTER_LIMIT], document *doc,
   // Save the queries to the struct
   quer->data = queries;
 
-  char *tok;
-  char *rest = *queries;
-
-  for(int j = 0; j < quer->query_count; j++) {
-
-    tok = strtok_r(queries[j], " ", &rest);
-
-    int count = 0;
-    int queryArray[4] = {0};
-
-    while (tok != NULL) {
-
-      if (tok != NULL)
-        queryArray[count++] = atoi(tok);
-
-      tok = strtok_r(NULL, " ", &rest);
-    }
-
-    switch(queryArray[0]) {
-      case 1:
-        printParagraph(*findParagraph(*doc, queryArray[1]));
-        break;
-      case 2:
-        printSentence(*findSentence(*doc, queryArray[1], queryArray[2]));
-        break;
-      case 3:
-        printWord(*findWord(*doc, queryArray[1], queryArray[2], queryArray[3]));
-        break;
-    }
-  }
-
   // Closes file
   fclose(fp);
 }
 
 // PRINTING FUNCTIONS
 int printWord(word w) {
-  // printf("%s", w.data);
-  printf("word");
+  printf("%s", w.data);
   return 1;
 }
 
 int printSentence(sentence s) {
-  // for (int i = 0; i < s.word_count; i++) {
-  //   printf("%s", s.data[i].data);
-  // }
-  printf("sentence");
+  for (int i = 0; i < s.word_count; i++) {
+    printf("%s", s.data[i].data);
+  }
   return 1;
 }
 
 int printParagraph(paragraph p) {
-  // for (int i = 0; i < p.sentence_count; i++) {
-  //   printSentence((p.data[i]));
-  // }
-  printf("paragraph");
+  for (int i = 0; i < p.sentence_count; i++) {
+    printSentence((p.data[i]));
+  }
   return 1;
 }
 
@@ -436,6 +399,40 @@ int getParagraphs(document *doc, char text[][CHARACTER_LIMIT]) {
   return 1;
 }
 
+int runQueries(query quer, document doc) {
+  char *tok, *rest;
+
+  for (int j = 0; j < quer.query_count; j++) {
+
+    rest = quer.data[j];
+    tok = strtok_r(quer.data[j], " ", &rest);
+
+    int count = 0;
+    int queryArray[4] = {0};
+
+    while (tok != NULL) {
+
+      if (tok != NULL)
+        queryArray[count++] = atoi(tok);
+
+      tok = strtok_r(NULL, " ", &rest);
+    }
+
+    switch (queryArray[0]) {
+    case 1:
+      printParagraph(*findParagraph(doc, queryArray[1]));
+      break;
+    case 2:
+      printSentence(*findSentence(doc, queryArray[1], queryArray[2]));
+      break;
+    case 3:
+      printWord(*findWord(doc, queryArray[1], queryArray[2], queryArray[3]));
+      break;
+    }
+  }
+
+  return 1;
+}
 // FREE FUNCTIIONS
 int freeDocument(document *doc) {
   for (int i = 0; i < doc->paragraph_count; i++) {
@@ -469,14 +466,12 @@ int freeWord(word w) {
   return 1;
 }
 
-paragraph *findParagraph(document doc, int k) {
-  return &doc.data[k-1];
-}
+paragraph *findParagraph(document doc, int k) { return &doc.data[k - 1]; }
 
 sentence *findSentence(document doc, int k, int m) {
-  return &doc.data[k-1].data[m-1];
+  return &doc.data[k - 1].data[m - 1];
 }
 
 word *findWord(document doc, int k, int m, int n) {
-  return &doc.data[k-1].data[m-1].data[n-1];
+  return &doc.data[k - 1].data[m - 1].data[n - 1];
 }
