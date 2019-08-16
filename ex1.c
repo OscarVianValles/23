@@ -57,6 +57,7 @@ int freeDocument(document *);
 int freeParagraph(paragraph);
 int freeSentence(sentence);
 int freeWord(word);
+int freeQueries(query *quer);
 
 paragraph *findParagraph(document, int);
 sentence *findSentence(document, int, int);
@@ -81,9 +82,9 @@ int main(int argc, char *argv[]) {
 
   getParagraphs(doc, text);
   runQueries(*quer, *doc);
-  free(quer);
+
+  freeQueries(quer);
   freeDocument(doc);
-  free(doc);
 
   return 0;
 }
@@ -232,6 +233,7 @@ int appendWord(sentence *s, word w) {
       memcpy(words, s->data, (sizeof(word *) * s->word_count));
 
       // Freeing current data
+      s->data = NULL;
       free(s->data);
     }
 
@@ -270,6 +272,7 @@ int appendSentence(paragraph *p, sentence s) {
       memcpy(sentences, p->data, (sizeof(sentence *) * p->sentence_count));
 
       // Freeing current data
+      p->data = NULL;
       free(p->data);
     }
 
@@ -433,13 +436,17 @@ int runQueries(query quer, document doc) {
 
   return 1;
 }
+
 // FREE FUNCTIIONS
 int freeDocument(document *doc) {
   for (int i = 0; i < doc->paragraph_count; i++) {
     freeParagraph(doc->data[i]);
   }
-
   free(doc->data);
+  doc->data = NULL;
+
+  free(doc);
+  doc = NULL;
   return 1;
 }
 
@@ -447,8 +454,8 @@ int freeParagraph(paragraph p) {
   for (int i = 0; i < p.sentence_count; i++) {
     freeSentence(p.data[i]);
   }
-
   free(p.data);
+  p.data = NULL;
   return 1;
 }
 
@@ -456,16 +463,33 @@ int freeSentence(sentence s) {
   for (int i = 0; i < s.word_count; i++) {
     freeWord(s.data[i]);
   }
-
   free(s.data);
+  s.data = NULL;
   return 1;
 };
 
 int freeWord(word w) {
   free(w.data);
+  w.data = NULL;
   return 1;
 }
 
+int freeQueries(query *quer) {
+  for (int i = 0; i < quer->query_count; i++) {
+    free(quer->data[i]);
+    quer->data[i] = NULL;
+  }
+
+  free(quer->data);
+  quer->data = NULL;
+
+  free(quer);
+  quer = NULL;
+
+  return 1;
+}
+
+// FIND FUNCTIONS
 paragraph *findParagraph(document doc, int k) { return &doc.data[k - 1]; }
 
 sentence *findSentence(document doc, int k, int m) {
