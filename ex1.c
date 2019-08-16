@@ -207,6 +207,7 @@ int printParagraph(paragraph p) {
   for (int i = 0; i < p.sentence_count; i++) {
     printSentence((p.data[i]));
   }
+  printf("\n");
   return 1;
 }
 
@@ -393,12 +394,14 @@ int getParagraphs(document *doc, char text[][CHARACTER_LIMIT]) {
     // Initializing data
     initParagraph(&newParagraph);
 
-    // Getting individual sentences. Since the structure of the text from
-    // reading the file is already separated by \n, there is no need to
-    // tokenize it anymore
-    getSentences(&newParagraph, text[i]);
+    // Tokenizing until \n in order to remove useless data from the string which
+    // causes errors
+    char *tok;
+    char *rest = text[i];
 
-    // printParagraph(newParagraph);
+    tok = strtok_r(text[i], "\n", &rest);
+
+    getSentences(&newParagraph, tok);
 
     // Appending paragraphs to document
     appendParagraph(doc, newParagraph);
@@ -432,10 +435,11 @@ int runQueries(query quer, document doc) {
       break;
     case 2:
       printSentence(*findSentence(doc, queryArray[1], queryArray[2]));
+      printf("\n");
       break;
     case 3:
       printWord(*findWord(doc, queryArray[1], queryArray[2], queryArray[3]));
-      break;
+      printf("\n");
     }
   }
 
