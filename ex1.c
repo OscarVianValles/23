@@ -199,7 +199,6 @@ void readFile(char *fileName, char text[][CHARACTER_LIMIT], document *doc,
         queryArray[count++] = atoi(tok);
 
       tok = strtok_r(NULL, " ", &rest);
-      count++;
     }
 
     switch(queryArray[0]) {
@@ -471,13 +470,13 @@ int freeWord(word w) {
 }
 
 paragraph *findParagraph(document doc, int k) {
-  return &doc.data[k];
+  return &doc.data[k-1];
 }
 
 sentence *findSentence(document doc, int k, int m) {
-  return &doc.data[k].data[m];
+  return &doc.data[k-1].data[m-1];
 }
 
 word *findWord(document doc, int k, int m, int n) {
-  return &doc.data[k].data[m].data[n];
+  return &doc.data[k-1].data[m-1].data[n-1];
 }
