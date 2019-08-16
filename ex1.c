@@ -193,8 +193,13 @@ int printWord(word w) {
 
 int printSentence(sentence s) {
   for (int i = 0; i < s.word_count; i++) {
-    printf("%s", s.data[i].data);
+    if (i < s.word_count - 1) {
+      printf("%s ", s.data[i].data);
+    } else {
+      printf("%s", s.data[i].data);
+    }
   }
+  printf(".");
   return 1;
 }
 
