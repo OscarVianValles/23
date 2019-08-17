@@ -187,120 +187,140 @@ void readFile(char *fileName, char text[][CHARACTER_LIMIT], document *doc,
 
 // PRINTING FUNCTIONS
 int printWord(word w) {
-  printf("%s", w.data);
-  return 1;
+  if(w.data != NULL) {
+    printf("%s", w.data);
+    return 1;
+  } else
+    return 0;
 }
 
 int printSentence(sentence s) {
-  for (int i = 0; i < s.word_count; i++) {
-    if (i < s.word_count - 1) {
-      printf("%s ", s.data[i].data);
-    } else {
-      printf("%s", s.data[i].data);
+  if(s.word_count > 0) {
+    for (int i = 0; i < s.word_count; i++) {
+      if (i < s.word_count - 1) {
+        printf("%s ", s.data[i].data);
+      } else {
+        printf("%s", s.data[i].data);
+      }
     }
-  }
-  printf(".");
-  return 1;
+    printf(".");
+    return 1;
+  } else
+    return 0;
 }
 
 int printParagraph(paragraph p) {
-  for (int i = 0; i < p.sentence_count; i++) {
-    printSentence((p.data[i]));
-  }
-  printf("\n");
-  return 1;
+  if(p.sentence_count > 0) {
+    for (int i = 0; i < p.sentence_count; i++) {
+      printSentence((p.data[i]));
+    }
+    printf("\n");
+    return 1;
+  } else
+    return 0;
 }
 
 // APPENDING FUNCTIONS
 
 // Appends words to the current sentence being modified
 int appendWord(sentence *s, word w) {
-  // Allocating new memory for the words arrays if the number of words currently
-  // in the struct is 1 less than the maximum it can hold.
-  if (s->word_count + 1 % 10 == 0 || s->word_count == 0) {
+  if(w.data != NULL) {
+    // Allocating new memory for the words arrays if the number of words currently
+    // in the struct is 1 less than the maximum it can hold.
+    if (s->word_count + 1 % 10 == 0 || s->word_count == 0) {
 
-    // creating the new pointer;
-    word *words;
-    // Handle the first creation of the sentences;
+      // creating the new pointer;
+      word *words;
+      // Handle the first creation of the sentences;
 
-    if (s->word_count == 0) {
-      words = malloc(sizeof(word *) * (s->word_count + 10));
+      if (s->word_count == 0) {
+        words = malloc(sizeof(word *) * (s->word_count + 10));
+      }
+
+      // Since the check will be true if the word_count will end in 9, ie 19 or
+      // 29, the additional memory ssaces to be added will be 11 to make it a
+      // round number;
+      else {
+        words = malloc(sizeof(word *) * (s->word_count + 11));
+      }
+
+      // Copying current data found in s->data
+      if (s->data != NULL) {
+        memcpy(words, s->data, (sizeof(word *) * s->word_count));
+
+        // Freeing current data
+        s->data = NULL;
+        free(s->data);
+      }
+
+      // Connecting the new pointer to the struct
+      s->data = words;
     }
 
-    // Since the check will be true if the word_count will end in 9, ie 19 or
-    // 29, the additional memory ssaces to be added will be 11 to make it a
-    // round number;
-    else {
-      words = malloc(sizeof(word *) * (s->word_count + 11));
-    }
+    // Adding the new word to the list
+    s->data[s->word_count++] = w;
 
-    // Copying current data found in s->data
-    if (s->data != NULL) {
-      memcpy(words, s->data, (sizeof(word *) * s->word_count));
+    return 1;
 
-      // Freeing current data
-      s->data = NULL;
-      free(s->data);
-    }
-
-    // Connecting the new pointer to the struct
-    s->data = words;
-  }
-
-  // Adding the new word to the list
-  s->data[s->word_count++] = w;
-  return 1;
+  } else
+    return 0;
 }
 
 int appendSentence(paragraph *p, sentence s) {
-  // Allocating new memory for the sentence arrays if the number of sentences
-  // currently in the struct is 1 less than the maximum it can hold.
-  if (p->sentence_count + 1 % 10 == 0 || p->sentence_count == 0) {
+  if(s.word_count > 0) {
+    // Allocating new memory for the sentence arrays if the number of sentences
+    // currently in the struct is 1 less than the maximum it can hold.
+    if (p->sentence_count + 1 % 10 == 0 || p->sentence_count == 0) {
 
-    // Creating the new pointer
-    sentence *sentences;
+      // Creating the new pointer
+      sentence *sentences;
 
-    // Handle the first creation of the sentences;
-    if (p->sentence_count == 0) {
-      sentences = malloc(sizeof(sentence *) * (p->sentence_count + 10));
+      // Handle the first creation of the sentences;
+      if (p->sentence_count == 0) {
+        sentences = malloc(sizeof(sentence *) * (p->sentence_count + 10));
+      }
+
+      // Since the check will be true if the sentence_count will end in 9, ie 19
+      // or 29, the additional memory spaces to be added will be 11 to make it a
+      // round number;
+      else {
+        sentences = malloc(sizeof(sentence *) * (p->sentence_count + 11));
+      }
+
+      // Copying current data found in p->data
+
+      if (p->data != NULL) {
+        memcpy(sentences, p->data, (sizeof(sentence *) * p->sentence_count));
+
+        // Freeing current data
+        p->data = NULL;
+        free(p->data);
+      }
+
+      // Connecting the new pointer to the struct
+      p->data = sentences;
     }
 
-    // Since the check will be true if the sentence_count will end in 9, ie 19
-    // or 29, the additional memory spaces to be added will be 11 to make it a
-    // round number;
-    else {
-      sentences = malloc(sizeof(sentence *) * (p->sentence_count + 11));
-    }
-
-    // Copying current data found in p->data
-
-    if (p->data != NULL) {
-      memcpy(sentences, p->data, (sizeof(sentence *) * p->sentence_count));
-
-      // Freeing current data
-      p->data = NULL;
-      free(p->data);
-    }
-
-    // Connecting the new pointer to the struct
-    p->data = sentences;
-  }
-
-  // Adding the new word to the list
-  p->data[p->sentence_count++] = s;
-  return 1;
+    // Adding the new word to the list
+    p->data[p->sentence_count++] = s;
+    return 1;
+  } else
+    return 0;
 }
 
 int appendParagraph(document *doc, paragraph p) {
-  // Allocate max memory for paragraph if first run
-  if (doc->data == NULL) {
-    paragraph *paragraphs = malloc(sizeof(paragraph) * PARAGRAPH_LIMIT);
-    doc->data = paragraphs;
-  }
+  if(p.sentence_count > 0) {
+    // Allocate max memory for paragraph if first run
+    if (doc->data == NULL) {
+      paragraph *paragraphs = malloc(sizeof(paragraph) * PARAGRAPH_LIMIT);
+      doc->data = paragraphs;
+    }
 
-  doc->data[doc->paragraph_count++] = p;
+    doc->data[doc->paragraph_count++] = p;
 
-  return 1;
+    return 1;
+  } else
+    return 0;
 }
 
 // GETTING FUNCTIONS
@@ -446,7 +466,7 @@ int runQueries(query quer, document doc) {
   return 1;
 }
 
-// FREE FUNCTIIONS
+// FREE FUNCTIONS
 int freeDocument(document *doc) {
   for (int i = 0; i < doc->paragraph_count; i++) {
     freeParagraph(doc->data[i]);
