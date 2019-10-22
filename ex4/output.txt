@@ -1,0 +1,61 @@
+--- Which Pairs are Enemies ---
+X = revGreen,
+Y = mrsWhite
+X = mrsWhite,
+Y = revGreen
+X = profPlum,
+Y = mrsWhite
+X = mrsWhite,
+Y = profPlum
+
+--- Which Pairs are Friends ---
+X = missScarlet,
+Y = drOrchid
+X = mrsPeacock,
+Y = drOrchid
+X = mrsPeacock,
+Y = drOrchid
+X = drOrchid,
+Y = mrsPeacock
+X = missScarlet,
+Y = profPlum
+X = missScarlet,
+Y = profPlum
+X = profPlum,
+Y = missScarlet
+X = profPlum,
+Y = missScarlet
+X = profPlum,
+Y = drOrchid
+X = Y, Y = profPlum
+X = drOrchid,
+Y = missScarlet
+X = drOrchid,
+Y = mrsPeacock
+X = drOrchid,
+Y = profPlum
+# Infinitely Loops
+
+--- Which people are liked by Prof Plum ---
+X = missScarlet
+X = missScarlet
+X = mrsWhite
+X = mrsPeacock
+X = drOrchid
+X = profPlum
+
+--- Which people like themselves ---
+X = profPlum
+# Infinitely Loops
+
+--- Which males are liked by females ---
+X = missScarlet,
+Y = profPlum
+X = drOrchid,
+Y = profPlum
+# Infinitely Loops
+
+--- Which people are hated by the one they like ---
+X = mrsWhite,
+Y = profPlum
+false

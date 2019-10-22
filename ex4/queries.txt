@@ -1,0 +1,12 @@
+--- Which pairs are enemies? ---
+enemies(X,Y)
+--- Which pairs are friends? ---
+friends(X,Y)
+--- Which people are liked by Prof. Plum. ---
+likes(profPlum, X)
+--- Which people like themselves? ---
+likes(X,X)
+--- Which males are liked by females? ---
+likes(X,Y), female(X), male(Y)
+--- Which people are hated by the one they like? ---
+hates(X,Y), likes(Y,X)
