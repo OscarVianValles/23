@@ -6,7 +6,7 @@ class AccountType(enum.Enum):
     Credit = 3
 
 class Account:
-    def __init__(self, isActive:bool = True, name:str = "Null", accountType:AccountType= AccountType.Payroll, balance:float = 0.0):
+    def __init__(self, isActive:bool = True, name:str = "Null", accountType:AccountType = AccountType.Payroll, balance:float = 0.0):
         self._isActive = isActive
         self._name = name
         self._accountType = accountType
@@ -26,7 +26,7 @@ class Account:
 
 class AccountWithdrawable(Account):
     def withdraw(self, amount:float):
-        if(self._balance - amount < 0):
+        if self._balance - amount < 0:
             raise Exception("Insufficient funds")
         else:
             self._balance -= amount
@@ -37,8 +37,11 @@ class AccountDepositable(Account):
 
 class AccountTransferable(Account):
     def transfer(self, amount:float, to:Account):
-        self._balance -= amount
-        to.receive(amount)
+        if self._balance - amount < 0:
+            raise Exception("Insufficient funds")
+        else:
+            self._balance -= amount
+            to.receive(amount)
 
 class AccountInterestGaining(Account):
     def __init__(self, isActive:bool = True, name:str = "Null", accountType:AccountType = AccountType.Payroll, balance:float = 0.0, interestRate:float = 0.0):
@@ -46,7 +49,10 @@ class AccountInterestGaining(Account):
         self._name = name
         self._accountType = accountType
         self._balance = balance
-        self._interestRate = interestRate
+        if interestRate < 0:
+            raise Exception('Interest Rate must be greater than 0')
+        else:
+            self._interestRate = interestRate
 
     def applyInterest(self):
         self._balance += self._balance * self._interestRate
@@ -64,14 +70,16 @@ class Credit(AccountWithdrawable, AccountDepositable, AccountTransferable, Accou
         self._accountType = AccountType.Credit
         self._balance = balance
         self._interestRate = interestRate
-        self._limit = limit
+        if limit < 0:
+            raise Exception("Limit must be greater than 0")
+        else:
+            self._limit = limit
 
     def withdraw(self, amount:float) -> bool:
-        if self._balance - amount <  -self._limit:
-            self._balance -= amount
-            return True
+        if self._balance - amount < -self._limit:
+            raise Exception("Insufficient funds")
         else:
-            return False
+            self._balance -= amount
 
 class Debit(AccountWithdrawable, AccountDepositable, AccountTransferable, AccountInterestGaining):
     def __init__(self, isActive:bool = True, name:str = "Null", balance:float = 0.0, interestRate:float = 0.0, requiredBalance:float = 0.0):
@@ -79,8 +87,14 @@ class Debit(AccountWithdrawable, AccountDepositable, AccountTransferable, Accoun
         self._name = name
         self._accountType = AccountType.Debit
         self._balance = balance
-        self._interestRate = interestRate
-        self._requiredBalance = requiredBalance
+        if interestRate < 0:
+            raise Exception('Interest Rate must be greater than 0')
+        else:
+            self._interestRate = interestRate
+        if requiredBalance < 0:
+            raise Exception('Required Balance must be greater than 0')
+        else:
+            self._requiredBalance = requiredBalance
 
     def checkRequiredBalance(self):
         if self._balance < self._requiredBalance:
