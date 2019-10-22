@@ -26,7 +26,10 @@ class Account:
 
 class AccountWithdrawable(Account):
     def withdraw(self, amount:float):
-        self._balance -= amount
+        if(self._balance - amount < 0):
+            raise Exception("Insufficient funds")
+        else:
+            self._balance -= amount
 
 class AccountDepositable(Account):
     def deposit(self, amount:float):
@@ -88,3 +91,4 @@ if __name__ == "__main__":
     a.withdraw(500)
     print(a.balanceReport())
     print(a.accountInfo())
+    a.withdraw(1600)
