@@ -24,7 +24,10 @@ class Account:
         self._isActive = False
 
     def balanceReport(self) -> str:
-        return "Remaining Balance: " + str(self._balance)
+        if self._isActive == False:
+            raise Exception("Account is inactive")
+        else:
+            return "Remaining Balance: " + str(self._balance)
 
     def accountInfo(self) -> str:
         return (
@@ -44,19 +47,26 @@ class AccountWithdrawable(Account):
     def withdraw(self, amount: float):
         if self._balance - amount < 0:
             raise Exception("Insufficient funds")
+        elif self._isActive == False:
+            raise Exception("Account is inactive")
         else:
             self._balance -= amount
 
 
 class AccountDepositable(Account):
     def deposit(self, amount: float):
-        self._balance += amount
+        if self._isActive == False:
+            raise Exception("Account is inactive")
+        else:
+            self._balance += amount
 
 
 class AccountTransferable(Account):
     def transfer(self, amount: float, to: Account):
         if self._balance - amount < 0:
             raise Exception("Insufficient funds")
+        elif self._isActive == False:
+            raise Exception("Account is inactive")
         else:
             self._balance -= amount
             to.receive(amount)
@@ -81,10 +91,16 @@ class AccountInterestGaining(Account):
             self._interestRate = interestRate
 
     def applyInterest(self):
-        self._balance += self._balance * self._interestRate
+        if self._isActive == False:
+            raise Exception("Account is inactive")
+        else:
+            self._balance += self._balance * self._interestRate
 
     def changeInterestRate(self, interestRate: float):
-        self._interestRate = interestRate
+        if interestRate < 0:
+            raise Exception("Interest Rate must be greater than 0")
+        else:
+            self._interestRate = interestRate
 
 
 class Payroll(AccountWithdrawable):
@@ -112,9 +128,11 @@ class Credit(
         else:
             self._limit = limit
 
-    def withdraw(self, amount: float) -> bool:
+    def withdraw(self, amount: float):
         if self._balance - amount < -self._limit:
             raise Exception("Insufficient funds")
+        elif self._isActive == False:
+            raise Exception("Account is inactive")
         else:
             self._balance -= amount
 
@@ -156,7 +174,6 @@ class Bank:
         self.__accounts.append(newAccount)
 
     def deleteAccount(self, delAccount: Account):
-        print("deleting")
         self.__accounts.remove(delAccount)        
 
     def accounts(self):
