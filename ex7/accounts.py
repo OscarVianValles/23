@@ -155,6 +155,10 @@ class Bank:
     def addAccount(self, newAccount: Account):
         self.__accounts.append(newAccount)
 
+    def deleteAccount(self, delAccount: Account):
+        print("deleting")
+        self.__accounts.remove(delAccount)        
+
     def accounts(self):
         return self.__accounts
 
