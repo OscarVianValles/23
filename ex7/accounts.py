@@ -67,6 +67,8 @@ class AccountTransferable(Account):
             raise Exception("Insufficient funds")
         elif self._isActive == False:
             raise Exception("Account is inactive")
+        elif to._isActive == False:
+            raise Exception("Account is inactive")
         else:
             self._balance -= amount
             to.receive(amount)
@@ -190,3 +192,7 @@ if __name__ == "__main__":
     citilink.addAccount(c)
     for i in citilink.accounts():
         print(i.accountInfo() + "\n")
+
+    a.transfer(1600, c)
+    a.checkRequiredBalance()
+    c.transfer(500, a)
