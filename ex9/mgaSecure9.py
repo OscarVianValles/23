@@ -102,10 +102,10 @@ class NormalMoblin(Moblin):
 
 class BlueMoblin(Moblin):
     def stab(self):
-        print("Blue moblin stabs you with a spear for 3 damage")
+        print("Blue moblin stabs you with a spear for 5 damage")
 
     def kick(self):
-        print("Blue moblin kicks you for 1 damage")
+        print("Blue moblin kicks you for 2 damage")
 
     def announce(self):
         print("A blue moblin appeared")
@@ -119,10 +119,10 @@ class BlueMoblin(Moblin):
 
 class SilverMoblin(Moblin):
     def stab(self):
-        print("Silver moblin stabs you with a spear for 3 damage")
+        print("Silver moblin stabs you with a spear for 10 damage")
 
     def kick(self):
-        print("Silver moblin kicks you for 1 damage")
+        print("Silver moblin kicks you for 3 damage")
 
     def announce(self):
         print("A silver moblin appeared")
@@ -163,7 +163,7 @@ class NormalLizalflos(Lizalflos):
 
 class BlueLizalflos(Lizalflos):
     def throwBoomerang(self):
-        print("Blue lizalflos throws its lizal boomerang at you for 2 damage")
+        print("Blue lizalflos throws its lizal boomerang at you for 3 damage")
 
     def hide(self):
         print("Blue lizalflos camouflages itself")
@@ -180,7 +180,7 @@ class BlueLizalflos(Lizalflos):
 
 class SilverLizalflos(Lizalflos):
     def throwBoomerang(self):
-        print("Silver lizalflos throws its lizal boomerang at you for 2 damage")
+        print("Silver lizalflos throws its lizal boomerang at you for 7 damage")
 
     def hide(self):
         print("Silver lizalflos camouflages itself")
@@ -265,8 +265,8 @@ class Encounter:
 
 
 if __name__ == "__main__":
-    # encounter = Encounter(EasyDungeon())
+    encounter = Encounter(EasyDungeon())
     # encounter = Encounter(MediumDungeon())
-    encounter = Encounter(HardDungeon())
+    # encounter = Encounter(HardDungeon())
     encounter.announceEnemies()
     encounter.moveEnemies()
